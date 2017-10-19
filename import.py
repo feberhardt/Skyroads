@@ -1,3 +1,3 @@
 import main
 
-test()
+main.test()
