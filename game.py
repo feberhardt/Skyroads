@@ -38,7 +38,7 @@ player_image.set_colorkey(WHITE)
 screen.blit(background_image, (0, 0))
 pygame.display.flip()
 running = True
-speed = 2
+speed = 3
 # Starting variables
 score = 0
 x_speed_coord = 0
