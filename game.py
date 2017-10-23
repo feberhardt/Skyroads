@@ -5,7 +5,9 @@ from pygame.locals import *
 if not pygame.font:
     print('Warning, fonts disabled')
 
-# Define some colors
+"""
+Define all the inital variables
+"""
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 GREEN = (0, 255, 0)
@@ -13,15 +15,14 @@ RED = (255, 0, 0)
 
 car = "audi_1.png"
 barrier = "concrete.png"
-# road = "road1.jpg"
-# road = "road2.jpg"
 road = "road.png"
 
 background_size = (1024, 750)
 car_size = (150, 100)
-concrete = (200,113)
 
-# initializing
+"""
+Initialize the game
+"""
 pygame.init()
 myfont = pygame.font.SysFont("monospace", 40)
 
@@ -31,38 +32,47 @@ background_image = pygame.image.load(road).convert()
 player_image = pygame.image.load(car).convert()
 concrete_img = pygame.image.load(barrier).convert()
 
+"""
+Initialize images
+"""
 background_colour = (WHITE)
 pygame.display.set_caption('Skyroads')
 screen.fill(background_colour)
 player_image.set_colorkey(WHITE)
+concrete_img.set_colorkey(WHITE)
 screen.blit(background_image, (0, 0))
 pygame.display.flip()
 running = True
 speed = 3
-# Starting variables
+
+"""
+Initialize game variables
+"""
 score = 0
 x_speed_coord = 0
 y_speed_coord = 0
-x_speed_concrete = 0
-y_speed_concrete = 0
+concrete_motion = 0
 
-# Initial position
-x_car_coord = 420
-y_car_coord = 10
-x_concrete_coord = 420
-y_concrete_coord = 1024
+"""
+Initialize position
+"""
+x_car_initial = 420
+y_car_initial = 10
+x_concrete_initial = 420
+y_concrete_intial = 100
+dx = 10
+dy = 20
 
-#Initial direction
-dx = 2
-dy = 5
 
-# Speed in pixels per frame
+"""
+Run the game
+"""
 while running:
-
+    concrete_motion += 5
     for event in pygame.event.get():
+        # Check if player quits the game
         if event.type == pygame.QUIT:
             running = False
-
         elif event.type == pygame.KEYDOWN:
         # Figure out if it was an arrow key. If so adjust speed.
             if event.key == pygame.K_LEFT:
@@ -83,17 +93,16 @@ while running:
                 x_speed_coord = 0
             elif event.key == pygame.K_UP or event.key == pygame.K_DOWN:
                 y_speed_coord = 0
-        # --- Game Logic
-        # Move the object according to the speed vector.
-    x_coord = x_car_coord + x_speed_coord
-    # y_coord = y_coord + y_speed
-    y_coord = background_size[1]*0.98 - car_size[1]
-    #player_image.x = x_coord
-    #player_image.y = y_coord
+
+    # Move the car and barriers according to the speed vector.
+    x_car_coord = x_car_initial + x_speed_coord
+    y_car_coord = background_size[1]*0.98 - car_size[1]
+    x_concrete_coord = x_concrete_initial
+    y_concrete_coord = y_concrete_intial + concrete_motion
 
     screen.blit(background_image, (0, 0))
-    # print(x_coord, y_coord)
-    screen.blit(player_image, [x_coord, y_coord])
+    screen.blit(player_image, [x_car_coord, y_car_coord])
+    screen.blit(concrete_img, [x_concrete_coord, y_concrete_coord])
 
     # add score
     score += 1
@@ -103,5 +112,5 @@ while running:
     pygame.display.flip()
     clock.tick(60)
     pygame.mouse.set_visible(0)
-    if x_coord <= 0 or x_coord >= background_size[0]- car_size[0]:
+    if x_car_coord <= 0 or x_car_coord >= background_size[0]- car_size[0]:
         running = False
