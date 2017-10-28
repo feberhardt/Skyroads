@@ -1,3 +1,9 @@
+"""
+Created on Thursday Oct 15, 2017
+SkyRoads: MiniProject 4
+
+@authors: Felix Eberhardt & Shreya Rangarajan
+"""
 import os, sys
 import pygame
 from pygame.locals import *
@@ -43,7 +49,7 @@ concrete_img.set_colorkey(WHITE)
 screen.blit(background_image, (0, 0))
 pygame.display.flip()
 running = True
-speed = 3
+speed = 10
 
 """
 Initialize game variables
@@ -59,9 +65,9 @@ Initialize position
 x_car_initial = 420
 y_car_initial = 10
 x_concrete_initial = 420
-y_concrete_intial = 100
-dx = 10
-dy = 20
+y_concrete_intial = 120
+dx = 25
+dy = 25
 
 
 """
@@ -76,13 +82,13 @@ while running:
         elif event.type == pygame.KEYDOWN:
         # Figure out if it was an arrow key. If so adjust speed.
             if event.key == pygame.K_LEFT:
-                x_speed_coord = dx + speed
+                x_speed_coord = speed
             elif event.key == pygame.K_RIGHT:
-                x_speed_coord = abs(dx-speed)
+                x_speed_coord = dx-speed
             elif event.key == pygame.K_UP:
-                y_speed_coord = dy + speed
+                y_speed_coord = speed
             elif event.key == pygame.K_DOWN:
-                y_speed_coord = abs(dy-speed)
+                y_speed_coord = dy-speed
             # press escape to get out of game
             elif event.key == pygame.K_ESCAPE:
                 running = False
@@ -90,9 +96,10 @@ while running:
         elif event.type == pygame.KEYUP:
             # If it is an arrow key, reset vector back to zero
             if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
-                x_speed_coord = 0
+                x_speed_coord = x_speed_coord
+                y_speed_coord = y_speed_coord
             elif event.key == pygame.K_UP or event.key == pygame.K_DOWN:
-                y_speed_coord = 0
+                pass
 
     # Move the car and barriers according to the speed vector.
     x_car_coord = x_car_initial + x_speed_coord
