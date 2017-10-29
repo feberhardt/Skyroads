@@ -28,6 +28,7 @@ brown = (165, 42, 42)
 car = "audi_1.png"
 barrier = "concrete.png"
 road = "road.png"
+barrier2 = "concrete.png"
 
 display_width = 1024
 display_height = 750
@@ -46,10 +47,10 @@ clock = pygame.time.Clock()
 background_image = pygame.image.load(road).convert()
 player_image = pygame.image.load(car).convert()
 player_image_rect = player_image.get_rect()
-#barriers = pygame.Group()
 concrete_img = pygame.image.load(barrier)
 concrete_img_rect = concrete_img.get_rect()
-#barriers.add(concrete_img)
+concrete_img2 = pygame.image.load(barrier2)
+concrete_img_rect2 = concrete_img2.get_rect()
 
 """
 Initialize images
@@ -78,10 +79,6 @@ def return_message(text):
     pygame.display.update()
     time.sleep(2)
     game_loop()
-
-#def crash(self, barrier):
-    #"""return message if crashed"""
-    #return_message('Crash')
 
 def score_count(score):
     """count up the score with every loop """
@@ -146,11 +143,13 @@ def game_loop():
     y_car_initial = 10
     x_concrete_initial = 420
     y_concrete_intial = 100
+    x_concrete_initial2 = 530
+    y_concrete_intial2 = 0
     dx = 10
     dy = 20
 
     while running:
-        concrete_motion += 5
+        concrete_motion += 4
         for event in pygame.event.get():
         # Check if player quits the game
             if event.type == pygame.QUIT:
@@ -176,6 +175,8 @@ def game_loop():
         y_car_coord = background_size[1]*0.98 - car_size[1]
         x_concrete_coord = x_concrete_initial
         y_concrete_coord = y_concrete_intial + concrete_motion
+        x_concrete_coord2 = x_concrete_initial2
+        y_concrete_coord2 = y_concrete_intial2 + concrete_motion
 
         screen.blit(background_image, (0, 0))
         screen.blit(player_image, [x_car_coord, y_car_coord])
@@ -184,6 +185,9 @@ def game_loop():
         screen.blit(concrete_img, [x_concrete_coord, y_concrete_coord])
         concrete_img_rect.x = x_concrete_coord
         concrete_img_rect.y = y_concrete_coord
+        screen.blit(concrete_img, [x_concrete_coord2, y_concrete_coord2])
+        concrete_img_rect2.x = x_concrete_coord2
+        concrete_img_rect2.y = y_concrete_coord2
 
         # add score
         score += 1
@@ -196,7 +200,8 @@ def game_loop():
             crash()
 
         hit = player_image_rect.colliderect(concrete_img_rect)
-        if hit:
+        hit2 = player_image_rect.colliderect(concrete_img_rect2)
+        if hit or hit2:
             screen.fill((255,255,255))
             print('Game Over')
 
