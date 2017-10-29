@@ -80,6 +80,14 @@ def return_message(text):
     time.sleep(2)
     game_loop()
 
+<<<<<<< HEAD
+=======
+# def crash(self, barrier):
+def crash():
+    """return message if crashed"""
+    return_message('Crash')
+
+>>>>>>> 816e736c673f3159db81d218a5e0af7448b9482d
 def score_count(score):
     """count up the score with every loop """
     score += 1
@@ -200,10 +208,17 @@ def game_loop():
             crash()
 
         hit = player_image_rect.colliderect(concrete_img_rect)
+<<<<<<< HEAD
         hit2 = player_image_rect.colliderect(concrete_img_rect2)
         if hit or hit2:
             screen.fill((255,255,255))
             print('Game Over')
+=======
+        if hit:
+            # screen.fill((255,255,255))
+            # print('Game Over')
+            crash()
+>>>>>>> 816e736c673f3159db81d218a5e0af7448b9482d
 
         pygame.display.update()
     pygame.quit()
