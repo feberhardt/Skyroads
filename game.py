@@ -48,7 +48,7 @@ myfont = pygame.font.SysFont("monospace", 40)
 screen = pygame.display.set_mode(background_size)
 clock = pygame.time.Clock()
 timer = pygame.time.get_ticks()
-barrier_limit = random.randint(1,4)
+barrier_limit = random.randint(1,3)
 
 background_image = pygame.image.load(road).convert()
 player_image = pygame.image.load(car).convert()
@@ -171,12 +171,12 @@ def game_loop():
     """
 
     running = True
-    speed = 8
+    speed = 6
     # Initialize game variables
     score = 0
     x_speed_coord = 0
     y_speed_coord = 0
-    concrete_motion = 6
+    concrete_motion = 4
     # Initialize position
     x_car_coord = 420
     y_car_initial = 10
