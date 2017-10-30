@@ -4,6 +4,9 @@ SkyRoads: MiniProject 4
 
 @authors: Felix Eberhardt & Shreya Rangarajan
 """
+from threading import Timer
+import time
+import random
 import os, sys, time
 import pygame
 from pygame.locals import *
@@ -34,7 +37,7 @@ display_width = 1024
 display_height = 750
 
 background_size = (display_width, display_height)
-car_size = (150, 100)
+car_size = (100, 67)
 
 """
 Initialize the game
@@ -44,13 +47,20 @@ myfont = pygame.font.SysFont("monospace", 40)
 
 screen = pygame.display.set_mode(background_size)
 clock = pygame.time.Clock()
+timer = pygame.time.get_ticks()
+barrier_limit = random.randint(1,4)
+
 background_image = pygame.image.load(road).convert()
 player_image = pygame.image.load(car).convert()
 player_image_rect = player_image.get_rect()
+barriers_list = []
+barriers_list_rect = []
+barriers_list_pos = []
 concrete_img = pygame.image.load(barrier)
+barriers_list.append(concrete_img)
+barriers_list_pos.append([420,100])
 concrete_img_rect = concrete_img.get_rect()
-concrete_img2 = pygame.image.load(barrier2)
-concrete_img_rect2 = concrete_img2.get_rect()
+barriers_list_rect.append(concrete_img_rect)
 
 """
 Initialize images
@@ -70,19 +80,45 @@ def text_objects(text, font):
 
 def return_message(text):
     """Create text output """
-
     largeText = pygame.font.Font('freesansbold.ttf',115)
     TextSurf, TextRect = text_objects(text, largeText)
     TextRect.center = ((display_width/2),(display_height/2))
     screen.blit(TextSurf, TextRect)
 
     pygame.display.update()
-    time.sleep(2)
-    game_loop()
+def barriers():
+    """Randomized barriers falling down at different times """
+    global timer
+    global barrier_limit
+    current_time = pygame.time.get_ticks()
+    timer_run = (current_time - timer)/1000
+
+    if timer_run > barrier_limit:
+        barrier_x = random.randint(325,575)
+        barrier_y = 0
+        concrete = pygame.image.load(barrier)
+        concrete_rectangle = concrete.get_rect()
+
+        global barriers_list
+        barriers_list.append(concrete)
+        global barriers_list_rect
+        barriers_list_rect.append(concrete_rectangle)
+        global barriers_list_pos
+        barriers_list_pos.append([barrier_x,barrier_y])
+        timer = pygame.time.get_ticks()
+        barrier_limit = random.randint(1,4)
 
 def crash():
-    """return message if crashed"""
+    """return message if crashed & remove barriers to restart game"""
     return_message('Game Over')
+
+    global barriers_list
+    barriers_list = []
+    global barriers_list_rect
+    barriers_list_rect = []
+    global barriers_list_pos
+    barriers_list_pos = []
+    time.sleep(2)
 
 def score_count(score):
     """count up the score with every loop """
@@ -110,7 +146,6 @@ def button(msg,x,y,w,h,ic,ac,action=None):
 
 def game_intro():
     """ Create a startmenu"""
-
     intro = True
 
     while intro:
@@ -136,28 +171,24 @@ def game_loop():
     """
 
     running = True
-    speed = 3
+    speed = 8
     # Initialize game variables
     score = 0
     x_speed_coord = 0
     y_speed_coord = 0
-    concrete_motion = 0
+    concrete_motion = 6
     # Initialize position
     x_car_coord = 420
     y_car_initial = 10
-    x_concrete_initial = 420
-    y_concrete_intial = 100
-    x_concrete_initial2 = 530
-    y_concrete_intial2 = 0
     dx = 10
     dy = 20
 
     while running:
-        concrete_motion += 4
         for event in pygame.event.get():
         # Check if player quits the game
             if event.type == pygame.QUIT:
-                running = False
+                pygame.quit()
+                quit()
             elif event.type == pygame.KEYDOWN:
                 # Figure out if it was an arrow key. If so adjust speed.
                 if event.key == pygame.K_LEFT:
@@ -176,22 +207,23 @@ def game_loop():
 
         # Move the car and barriers according to the speed vector.
         x_car_coord += x_speed_coord
+        if x_car_coord > 555:
+            x_car_coord = 555
+        if x_car_coord < 320:
+            x_car_coord = 320
         y_car_coord = background_size[1]*0.98 - car_size[1]
-        x_concrete_coord = x_concrete_initial
-        y_concrete_coord = y_concrete_intial + concrete_motion
-        x_concrete_coord2 = x_concrete_initial2
-        y_concrete_coord2 = y_concrete_intial2 + concrete_motion
 
         screen.blit(background_image, (0, 0))
         screen.blit(player_image, [x_car_coord, y_car_coord])
         player_image_rect.x = x_car_coord
         player_image_rect.y = y_car_coord
-        screen.blit(concrete_img, [x_concrete_coord, y_concrete_coord])
-        concrete_img_rect.x = x_concrete_coord
-        concrete_img_rect.y = y_concrete_coord
-        screen.blit(concrete_img, [x_concrete_coord2, y_concrete_coord2])
-        concrete_img_rect2.x = x_concrete_coord2
-        concrete_img_rect2.y = y_concrete_coord2
+
+        for i in range(0,len(barriers_list_rect)):
+            # Update barrier position in the position list
+            barriers_list_pos[i][1] = barriers_list_pos[i][1] + concrete_motion
+            screen.blit(barriers_list[i], [barriers_list_pos[i][0], barriers_list_pos[i][1]])
+            barriers_list_rect[i].x = barriers_list_pos[i][0]
+            barriers_list_rect[i].y = barriers_list_pos[i][1]
 
         # add score
         score += 1
@@ -203,19 +235,18 @@ def game_loop():
         if x_car_coord <= 0 or x_car_coord >= background_size[0]- car_size[0]:
             crash()
 
-        hit = player_image_rect.colliderect(concrete_img_rect)
-        hit2 = player_image_rect.colliderect(concrete_img_rect2)
-        if hit or hit2:
-            crash()
-            
-    pygame.quit()
-    quit()
+        for i in range(0,len(barriers_list_rect)):
+            hit = player_image_rect.colliderect(barriers_list_rect[i])
+            if hit:
+                crash()
+                game_intro()
+                break
 
+        barriers()
 
 """
 Run the game
 """
 game_intro()
-game_loop()
 pygame.quit()
 quit()
